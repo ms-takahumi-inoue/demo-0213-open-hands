@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO App</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .todo-item { margin: 10px 0; }
+        .completed { text-decoration: line-through; }
+    </style>
+</head>
+<body>
+    <h1>TODO List</h1>
+    <div id="todo-list"></div>
+    <input type="text" id="new-todo-text" placeholder="New TODO">
+    <button onclick="addTodo()">Add</button>
+
+    <script>
+        async function fetchTodos() {
+            const response = await fetch('/todos');
+            const todos = await response.json();
+            const todoList = document.getElementById('todo-list');
+            todoList.innerHTML = '';
+            todos.forEach(todo => {
+                const todoItem = document.createElement('div');
+                todoItem.className = 'todo-item' + (todo.completed ? ' completed' : '');
+                todoItem.textContent = todo.text;
+                todoList.appendChild(todoItem);
+            });
+        }
+
+        async function addTodo() {
+            const text = document.getElementById('new-todo-text').value;
+            if (!text) return;
+            await fetch('/todos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+            document.getElementById('new-todo-text').value = '';
+            fetchTodos();
+        }
+
+        fetchTodos();
+    </script>
+</body>
+</html>
